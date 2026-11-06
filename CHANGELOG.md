@@ -2,6 +2,15 @@
 
 SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
 
+## 0.3.2 (2026-11-06)
+
+- `testing`: What U Hear now plays the output back at the same level (0 dB).
+  The earlier -3.1 dB was a misreading: a -20 dBFS-peak sine's RMS is -23 dB.
+  The driver confirms What U Hear is level-exact, and AudioMon measured
+  within 0.1-0.3 dB of the output on the real card.
+- `testing`: the Optical In notes now say what really happens with no light:
+  the driver refuses the capture and PipeWire's node carries on with silence.
+
 ## 0.3.1 (2026-11-06)
 
 - `palettes`: each palette has its own `METER_ZONES` (normal, high, over).
@@ -29,7 +38,7 @@ SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
   - A fake PipeWire graph built from the real-machine snapshot (now in
     `testing/fixtures/`), with ports and links in pw-dump's format.
   - Running / idle / suspended states that honour `node.passive`.
-  - What U Hear following the output 3.1 dB lower, and a silent-restart
+  - What U Hear following the output (3.1 dB lower until 0.3.2), and a silent-restart
     switch to fake the bug.
   - Optical In sending digital silence when dark, as the real card does.
   - The card dropping off and coming back.

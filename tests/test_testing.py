@@ -124,13 +124,13 @@ class States(Rig):
 
 
 class Levels(Rig):
-    def test_what_u_hear_follows_the_output_3_1_db_lower(self):
+    def test_what_u_hear_matches_the_output(self):
         out, wuh = self.meter("sbae9-test.out", passive=True), self.meter("sbae9-test.wuh")
         self.wire(SINK, ("monitor_FL", "monitor_FR"), out)
         self.wire(WHAT_U_HEAR, ("capture_FL", "capture_FR"), wuh)
         self.pw.add_stream("mpv", "tone", -20)
         self.assertAlmostEqual(self.peak_db(out), -20, places=3)
-        self.assertAlmostEqual(self.peak_db(wuh), -23.1, places=3)
+        self.assertAlmostEqual(self.peak_db(wuh), -20, places=3)       # level-exact, 0 dB
 
     def test_silent_restart(self):
         wuh = self.meter()
