@@ -2,6 +2,13 @@
 
 SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
 
+## 0.3.5 (2026-11-06)
+
+- `ae9.is_ae9` skips virtual nodes (`node.virtual`): echo-cancel,
+  filter-chain and loopback nodes named after the card (the driver's
+  WebRTC voice config makes "ae9_voice" / "ae9_voice_ref") were taken for
+  the card's own sink and mic.
+
 ## 0.3.4 (2026-11-06)
 
 - `testing.mixer` and the kit's tests use the driver's new jack names: the

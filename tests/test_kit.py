@@ -38,6 +38,15 @@ class Ae9Test(unittest.TestCase):
     def test_the_apps_own_nodes_are_not_the_card(self):
         self.assertFalse(ae9.is_ae9(METER))
 
+    def test_virtual_nodes_named_after_the_card_are_not_the_card(self):
+        # the driver's WebRTC voice config: an echo-cancel pair named "AE-9 Voice ..."
+        voice = {"node.name": "ae9_voice", "node.description": "AE-9 Voice (WebRTC)",
+                 "media.class": "Audio/Source", "node.virtual": True}
+        ref = {"node.name": "ae9_voice_ref", "media.class": "Audio/Sink", "node.virtual": "true"}
+        self.assertFalse(ae9.is_ae9(voice))
+        self.assertFalse(ae9.is_ae9(ref))
+        self.assertTrue(ae9.is_ae9(dict(SINK, **{"node.virtual": False})))
+
     def test_input_kinds(self):
         self.assertEqual(ae9.input_kind(MIC), "mic")
         self.assertEqual(ae9.input_kind(OPTICAL), "optical_in")
