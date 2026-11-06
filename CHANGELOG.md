@@ -2,6 +2,23 @@
 
 SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
 
+## 0.2.0 (2026-11-06)
+
+- `testing`: the fake AE-9 both apps test against, from SbAe9-AudioMon's rig.
+  - A fake PipeWire graph built from the real-machine snapshot (now in
+    `testing/fixtures/`), with ports and links in pw-dump's format.
+  - Running / idle / suspended states that honour `node.passive`.
+  - What U Hear following the output 3.1 dB lower, and a silent-restart
+    switch to fake the bug.
+  - Optical In sending digital silence when dark, as the real card does.
+  - The card dropping off and coming back.
+  - A `run()` dispatcher for PipeWire commands (`pw-dump`, `pw-link` built
+    in, others via `handle()`), a fake `pw-link` worker and fake `pw-record`
+    meters.
+  - Harness helpers: `isolate()` (temp XDG folders), `block_subprocesses()`
+    and one `TIME_SCALE` for every modelled wait.
+  - Room for SBC's fake ALSA mixer as `testing/mixer.py`.
+
 ## 0.1.0 (2026-11-06)
 
 First cut, pulled together from the two apps.

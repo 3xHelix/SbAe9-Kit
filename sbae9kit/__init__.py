@@ -13,6 +13,7 @@ pass them in.
     glass     Glass: see-through backgrounds, KDE blur behind
     desktop   UI scale, XWayland choice, WM_CLASS, relaunch, app icon
     frame     the frameless window's title bar and edge grips
+    testing   the fake AE-9 both apps' tests run against (tests only)
 """
 
-KIT_VERSION = "0.1.0"
+KIT_VERSION = "0.2.0"
