@@ -131,6 +131,8 @@ class VendorTest(unittest.TestCase):
             with open(os.path.join(kit, "glass.py"), "a") as f:
                 f.write("# local tweak\n")
             self.assertTrue(any("glass.py" in p for p in vendor.verify(kit)))
+        finally:
+            shutil.rmtree(app)
 
     def test_sub_folders_and_data_files_come_along(self):
         import subprocess
@@ -152,8 +154,6 @@ class VendorTest(unittest.TestCase):
             self.assertTrue(any("missing" in p for p in vendor.verify(kit)))
         finally:
             shutil.rmtree(sub)
-            shutil.rmtree(app)
-        finally:
             shutil.rmtree(app)
 
 
