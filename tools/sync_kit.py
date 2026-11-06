@@ -36,12 +36,14 @@ def sync(app):
     shutil.rmtree(tmp, ignore_errors=True)
     os.makedirs(tmp)
     for name in vendor.files(SRC):
-        shutil.copy2(os.path.join(SRC, name), tmp)
+        target = os.path.join(tmp, *name.split("/"))
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        shutil.copy2(os.path.join(SRC, *name.split("/")), target)
     with open(os.path.join(tmp, "MANIFEST"), "w") as f:
         f.write("# sbae9kit, vendored from SbAe9-Kit by tools/sync_kit.py. Don't edit here.\n")
         f.write(f"kit {KIT_VERSION}\ncommit {commit()}\n")
         for name in vendor.files(tmp):
-            f.write(f"{name} {vendor.digest(os.path.join(tmp, name))}\n")
+            f.write(f"{name} {vendor.digest(os.path.join(tmp, *name.split('/')))}\n")
     shutil.rmtree(dest, ignore_errors=True)
     os.rename(tmp, dest)
     problems = vendor.verify(dest)

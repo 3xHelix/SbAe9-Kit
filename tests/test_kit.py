@@ -131,6 +131,28 @@ class VendorTest(unittest.TestCase):
             with open(os.path.join(kit, "glass.py"), "a") as f:
                 f.write("# local tweak\n")
             self.assertTrue(any("glass.py" in p for p in vendor.verify(kit)))
+
+    def test_sub_folders_and_data_files_come_along(self):
+        import subprocess
+        sub = os.path.join(ROOT, "sbae9kit", "_probe")
+        app = tempfile.mkdtemp()
+        os.makedirs(os.path.join(sub, "fixtures"))
+        try:
+            for rel, text in (("__init__.py", ""), ("fixtures/x.json", "{}")):
+                with open(os.path.join(sub, rel), "w") as f:
+                    f.write(text)
+            r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "sync_kit.py"), app],
+                               capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            kit = os.path.join(app, "sbae9kit")
+            self.assertTrue(os.path.exists(os.path.join(kit, "_probe", "fixtures", "x.json")))
+            self.assertIn("_probe/fixtures/x.json", vendor.read_manifest(kit))
+            self.assertEqual(vendor.verify(kit), [])
+            os.remove(os.path.join(kit, "_probe", "fixtures", "x.json"))
+            self.assertTrue(any("missing" in p for p in vendor.verify(kit)))
+        finally:
+            shutil.rmtree(sub)
+            shutil.rmtree(app)
         finally:
             shutil.rmtree(app)
 
