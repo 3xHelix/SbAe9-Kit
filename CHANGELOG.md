@@ -2,6 +2,14 @@
 
 SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
 
+## 0.3.4 (2026-11-06)
+
+- `testing.mixer` and the kit's tests use the driver's new jack names: the
+  head unit's plug switches are "Head Unit 3.5mm Phones Plugged" and
+  "Head Unit 3.5mm Mic Plugged", and the mic's desktop name is
+  "AE-9 Head Unit Mic / Aux". (The 0.6.8 control snapshot has no plug
+  switches, so it's unchanged.)
+
 ## 0.3.3 (2026-11-06)
 
 - `testing`: the fake card names the head unit's input as the driver's

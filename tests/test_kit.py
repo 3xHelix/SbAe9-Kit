@@ -17,7 +17,7 @@ from sbae9kit import ae9, desktop, glass, palettes, vendor  # noqa: E402
 SINK = {"node.name": "alsa_output.pci-0000_06_00.0.analog-stereo", "media.class": "Audio/Sink",
         "alsa.card_name": "Sound Blaster AE-9", "api.alsa.path": "hw:3,0"}
 MIC = {"node.name": "alsa_input.pci-0000_06_00.0.analog-stereo", "alsa.card_name": "Sound Blaster AE-9",
-       "node.description": "AE-9 Mic / Line In", "api.alsa.path": "hw:3,0"}
+       "node.description": "AE-9 Head Unit Mic / Aux", "api.alsa.path": "hw:3,0"}
 OPTICAL = {"node.name": "alsa_input.ae9_optical", "api.alsa.path": "hw:AE9,1",
            "node.description": "AE-9 Optical In"}
 WUH = {"node.name": "alsa_input.ae9_what_u_hear", "api.alsa.path": "hw:AE9,2",

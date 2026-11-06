@@ -46,9 +46,9 @@ class FakeMixerTest(unittest.TestCase):
 
     def test_controls_newer_drivers_add(self):
         self.m.add_bool("Optical Out Playback Switch", True)
-        self.m.add_bool("Head Unit Phones Plugged", False, writable=False)
+        self.m.add_bool("Head Unit 3.5mm Phones Plugged", False, writable=False)
         self.m.add_enum("Capture Bit Depth", ["24-bit", "32-bit"])
-        self.assertFalse(self.m.controls["Head Unit Phones Plugged"].writable)
+        self.assertFalse(self.m.controls["Head Unit 3.5mm Phones Plugged"].writable)
         self.m.set("Capture Bit Depth", "32-bit")
         self.assertEqual(self.m.get("Capture Bit Depth"), 1)
         self.m.remove("Optical Out Playback Switch")
