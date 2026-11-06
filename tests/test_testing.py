@@ -65,6 +65,9 @@ class Graph(Rig):
             self.assertEqual(self.pw.state(n), "suspended")
         self.assertEqual(ae9.input_kind(self.pw.node(WHAT_U_HEAR)["info"]["props"]), "what_u_hear")
         self.assertEqual(ae9.input_kind(self.pw.node(OPTICAL)["info"]["props"]), "optical_in")
+        mic = self.pw.node(MIC)["info"]["props"]
+        self.assertEqual(mic["node.description"], testing.MIC_DESC)   # the driver's head-unit name
+        self.assertEqual(ae9.input_kind(mic), "mic")
         sink_ports = {p["info"]["props"]["port.name"]: p["info"]["props"]["port.monitor"]
                       for p in self.pw.ports(self.pw.node(SINK)["id"])}
         self.assertEqual(sink_ports, {"playback_FL": False, "playback_FR": False,

@@ -2,6 +2,13 @@
 
 SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
 
+## 0.3.3 (2026-11-06)
+
+- `testing`: the fake card names the head unit's input as the driver's
+  desktop names do: "AE-9 Head Unit Mic / Aux" (the XLR/TRS and 3.5 mm mic
+  jacks share it; it was "Mic / Line In"). Node names are unchanged.
+  `testing.MIC_DESC` holds it.
+
 ## 0.3.2 (2026-11-06)
 
 - `testing`: What U Hear now plays the output back at the same level (0 dB).
