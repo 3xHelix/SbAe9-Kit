@@ -114,7 +114,14 @@ class GlassPaletteTest(unittest.TestCase):
         keys = set(palettes.PALETTES["command"])
         for name, p in palettes.PALETTES.items():
             self.assertEqual(set(p), keys, name)          # every palette has every colour
-            self.assertEqual(len(palettes.meter_zones(name)), 3)
+            zones = palettes.meter_zones(name)
+            self.assertEqual(len(set(zones)), 3, name)
+            hues = [__import__("colorsys").rgb_to_hsv(*(int(z[i:i + 2], 16) / 255 for i in (1, 3, 5)))[0]
+                    for z in zones]
+            # normal, high and over are different colours, not shades of one
+            for a, b in ((0, 1), (1, 2), (0, 2)):
+                d = abs(hues[a] - hues[b])
+                self.assertGreater(min(d, 1 - d), 0.05, f"{name} zones {a},{b}")
         self.assertIs(palettes.get("nope"), palettes.PALETTES["command"])
 
 

@@ -23,6 +23,7 @@ PALETTES = {
         "SEG": "#3d3e4c", "SEG_HOVER": "#4c4e5e", "CARD_CAP": "#3f3f4a", "SPEAKER_BOX": "#33355a",
         "OK": "#33d14f", "WARN": "#e9c64a",
         "METER": ["#1fa6b8", "#7fd16a", "#e9c64a", "#e2505c"],
+        "METER_ZONES": ["#7fd16a", "#e9c64a", "#e2505c"],   # level meters: normal, high, over
         "OVERLAY": "#ffffff", "SHADE": "#000000", "DOT_IDLE": "#f2f2f2",
         "HANDLE": "#f2f2f6", "HANDLE_BORDER": "#f2f2f6", "HANDLE_HOVER": "#ffffff",
     },
@@ -42,6 +43,7 @@ PALETTES = {
         "SEG": "#2e2449", "SEG_HOVER": "#3b2e5e", "CARD_CAP": "#2a2145", "SPEAKER_BOX": "#3b2e5e",
         "OK": "#5dcaa8", "WARN": "#ffb63a",
         "METER": ["#5dcaa8", "#5dcaa8", "#ffb63a", "#e31b49"],
+        "METER_ZONES": ["#5dcaa8", "#ffb63a", "#e31b49"],   # level meters: normal, high, over
         "OVERLAY": "#ffffff", "SHADE": "#000000", "DOT_IDLE": "#f2f2f2",
         "HANDLE": "#f2f2f6", "HANDLE_BORDER": "#f2f2f6", "HANDLE_HOVER": "#ffffff",
     },
@@ -61,6 +63,7 @@ PALETTES = {
         "SEG": "#ebe1da", "SEG_HOVER": "#e3d4cc", "CARD_CAP": "#f5eee8", "SPEAKER_BOX": "#efe3dd",
         "OK": "#7fae8c", "WARN": "#d9a441",
         "METER": ["#dda394", "#db8176", "#cf6a5e", "#b8433a"],
+        "METER_ZONES": ["#7fae8c", "#d9a441", "#b8433a"],   # level meters: normal, high, over
         "OVERLAY": "#5a3a36", "SHADE": "#8a5a50", "DOT_IDLE": "#b9aaa5",
         "HANDLE": "#ffffff", "HANDLE_BORDER": "#cf7166", "HANDLE_HOVER": "#fff4f1",
     },
@@ -81,6 +84,7 @@ PALETTES = {
         "SEG": "#26356f", "SEG_HOVER": "#33458f", "CARD_CAP": "#3d3527", "SPEAKER_BOX": "#2e3f86",
         "OK": "#8fce6f", "WARN": "#f0d050",
         "METER": ["#6fb660", "#94ce7b", "#f0d050", "#e05a4f"],
+        "METER_ZONES": ["#94ce7b", "#f0d050", "#e05a4f"],   # level meters: normal, high, over
         "OVERLAY": "#ffffff", "SHADE": "#000000", "DOT_IDLE": "#eef3e6",
         "HANDLE": "#eef3e6", "HANDLE_BORDER": "#eef3e6", "HANDLE_HOVER": "#ffffff",
     },
@@ -103,6 +107,7 @@ def rgba(hex_color, alpha):
 
 
 def meter_zones(name):
-    """Three level-meter colours (low, high, over) for a palette: the last
-    three stops of its METER gradient."""
-    return tuple(get(name)["METER"][1:4])
+    """Three level-meter colours (normal, high, over) for a palette. They're
+    their own entry, not METER's stops: a light palette's gradient can be
+    shades of one colour, and meter zones must read as green / amber / red."""
+    return tuple(get(name)["METER_ZONES"])

@@ -2,6 +2,14 @@
 
 SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
 
+## 0.3.1 (2026-11-06)
+
+- `palettes`: each palette has its own `METER_ZONES` (normal, high, over).
+  Albino's came from its coral meter gradient, so all three were nearly the
+  same shade and a normal level already looked like a warning; it now uses
+  its green, gold and a deeper red. Command, Helix and Wololo keep the same
+  colours as before. Spotted by SbAe9-AudioMon on its meters.
+
 ## 0.3.0 (2026-11-06)
 
 - `testing.mixer`: SBC's fake ALSA mixer for control apps' tests, from a
