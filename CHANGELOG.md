@@ -2,6 +2,19 @@
 
 SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
 
+## 0.3.0 (2026-11-06)
+
+- `testing.mixer`: SBC's fake ALSA mixer for control apps' tests, from a
+  snapshot of the real card's controls (`testing/fixtures/ae9_controls.json`,
+  driver 0.6.8). Writes come back as change events like the real card's, and
+  changes "from elsewhere" (the knob, alsamixer) arrive the same way.
+  - New: controls can be greyed out (`set_inactive`): they keep their
+    value, still write, and send an INFO event, the way the driver greys
+    the effects out with SBX off.
+  - `add_bool` / `add_enum` for controls newer drivers have (read-only ones
+    too), `set_items`, `remove`.
+  - It imports `sbae9kit.mixer`, so listen-only apps leave it alone.
+
 ## 0.2.0 (2026-11-06)
 
 - `testing`: the fake AE-9 both apps test against, from SbAe9-AudioMon's rig.

@@ -30,7 +30,7 @@ so an edit made in an app's copy fails that app's tests.
 | `glass` | Glass: see-through backgrounds on any palette, KDE's blur behind |
 | `desktop` | UI scale, the XWayland choice (scaled UI or Glass), the window's X11 name for docks, relaunching, the app icon |
 | `frame` | The frameless window's title bar (drag, double-click) and edge grips |
-| `testing` | The fake AE-9 for tests: a fake PipeWire graph from a snapshot of the real machine (states, passive links, What U Hear, silent restart, card drop-out), fake `pw-link` and `pw-record`, temp folders, blocked commands, one `TIME_SCALE`. Tests only |
+| `testing` | The fake AE-9 for tests: a fake PipeWire graph from a snapshot of the real machine (states, passive links, What U Hear, silent restart, card drop-out), fake `pw-link` and `pw-record`, temp folders, blocked commands, one `TIME_SCALE`; `testing.mixer`: the fake ALSA mixer (control apps only). Tests only |
 | `vendor` | The vendored-copy check |
 
 Nothing in the kit keeps state: apps hold their own settings and pass them in.

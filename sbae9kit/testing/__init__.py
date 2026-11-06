@@ -9,6 +9,8 @@ In added the way the driver's PipeWire config adds them.
     pipewire   FakePipeWire (graph, ports, links, running / idle / suspended,
                levels, a run() dispatcher for PipeWire commands), FakeLinker
                (pw-link), make_fake_capture (pw-record meters)
+    mixer      FakeMixer, the card's ALSA controls (control apps only; it
+               imports sbae9kit.mixer, so listen-only apps don't import it)
 
 A test harness in each app (tests/support.py) does, before loading the app:
 
