@@ -2,6 +2,15 @@
 
 SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
 
+## 0.3.6 (2026-11-07)
+
+- `ae9` knows driver 0.10.1's Rear RCA In (the head unit's rear RCA jacks,
+  hw:AE9,3, node `alsa_input.ae9_rear_rca` from config/ae9-rear-rca-in.conf):
+  `EXTRA_INPUTS["rear_rca"]`, and `input_kind` returns "rear_rca" for it.
+  Before, it was taken for the mic.
+- The fake AE-9 can add Rear RCA In (`FakePipeWire(rear_rca=True)`, level
+  `rear_rca_db`, `testing.REAR_RCA`). It's off by default.
+
 ## 0.3.5 (2026-11-06)
 
 - `ae9.is_ae9` skips virtual nodes (`node.virtual`): echo-cancel,

@@ -73,6 +73,18 @@ class Graph(Rig):
         self.assertEqual(sink_ports, {"playback_FL": False, "playback_FR": False,
                                       "monitor_FL": True, "monitor_FR": True})
 
+    def test_rear_rca_in_when_asked_for(self):
+        self.assertIsNone(self.pw.node(testing.REAR_RCA))         # off by default
+        pw = testing.FakePipeWire(rear_rca=True)
+        props = pw.node(testing.REAR_RCA)["info"]["props"]
+        self.assertEqual((props["node.description"], props["api.alsa.path"]), ("AE-9 Rear RCA In", "hw:AE9,3"))
+        self.assertTrue(ae9.is_ae9(props))
+        self.assertEqual(ae9.input_kind(props), "rear_rca")
+        pw.card_present(False)
+        self.assertIsNone(pw.node(testing.REAR_RCA))
+        pw.card_present(True)                                     # comes back with the card
+        self.assertIsNotNone(pw.node(testing.REAR_RCA))
+
     def test_reads_like_pw_dump(self):
         v0 = self.pw.version
         dumped = json.loads(self.pw.run("pw-dump"))

@@ -52,6 +52,9 @@ class Ae9Test(unittest.TestCase):
         self.assertEqual(ae9.input_kind(OPTICAL), "optical_in")
         self.assertEqual(ae9.input_kind(WUH), "what_u_hear")
         self.assertEqual(ae9.input_kind({"node.name": "x", "api.alsa.path": "hw:AE9,2"}), "what_u_hear")
+        self.assertEqual(ae9.input_kind({"node.name": "alsa_input.ae9_rear_rca"}), "rear_rca")
+        self.assertEqual(ae9.input_kind({"node.name": "x", "api.alsa.path": "hw:AE9,3"}), "rear_rca")
+        self.assertEqual(ae9.input_kind({"node.name": "x", "node.description": "AE-9 Rear RCA In"}), "rear_rca")
         self.assertEqual(ae9.input_kind({"node.name": "alsa_input.foo.iec958-stereo"}), "optical_in")
 
     def test_versions_and_hw_params(self):
