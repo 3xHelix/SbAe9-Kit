@@ -57,6 +57,14 @@ class Ae9Test(unittest.TestCase):
         self.assertEqual(ae9.input_kind({"node.name": "x", "node.description": "AE-9 Rear RCA In"}), "rear_rca")
         self.assertEqual(ae9.input_kind({"node.name": "alsa_input.foo.iec958-stereo"}), "optical_in")
 
+    def test_output_kinds(self):
+        self.assertEqual(ae9.output_kind({"node.name": "alsa_output.pci-0000_06_00.0.analog-stereo"}), "main")
+        self.assertEqual(ae9.output_kind({"node.name": "alsa_output.pci-0000_06_00.0.analog-surround-51"}), "main")
+        self.assertEqual(ae9.output_kind({"node.name": "alsa_output.pci-0000_06_00.0.optical_out"}), "optical_out")
+        self.assertEqual(ae9.output_kind({"node.name": "alsa_output.ae9_optical"}), "optical_out")
+        self.assertEqual(ae9.output_kind({"node.name": "x", "api.alsa.path": "hw:AE9,4"}), "optical_out")
+        self.assertEqual(ae9.output_kind({"node.name": "x", "node.description": "AE-9 Optical Out"}), "optical_out")
+
     def test_versions_and_hw_params(self):
         self.assertTrue(ae9.driver_at_least(0, 9, 1, version="0.9.2"))
         self.assertFalse(ae9.driver_at_least(0, 9, 1, version="0.8.0"))

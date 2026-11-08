@@ -17,6 +17,17 @@ class FakeMixerTest(unittest.TestCase):
     def tearDown(self):
         self.m.close()
 
+    def test_iec958_status(self):
+        m = self.m
+        c = m.add_iec958(status=b"\x06")
+        self.assertEqual(c.type, alsa.TYPE_IEC958)
+        self.assertEqual(m.get_iec958("IEC958 Playback Default")[:2], b"\x06\x00")
+        m.read_events()
+        m.set_iec958("IEC958 Playback Default", b"\x04")
+        self.assertEqual(m.get_iec958("IEC958 Playback Default")[0], 0x04)
+        self.assertEqual(len(m.get_iec958("IEC958 Playback Default")), 24)
+        self.assertEqual(m.read_events(), [(c.numid, alsa.EVENT_MASK_VALUE)])
+
     def test_starts_from_the_real_snapshot(self):
         self.assertEqual(len(self.m.controls), len(load_controls()))
         self.assertTrue(self.m.has("Direct Mode Switch"))

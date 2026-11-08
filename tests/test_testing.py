@@ -85,6 +85,23 @@ class Graph(Rig):
         pw.card_present(True)                                     # comes back with the card
         self.assertIsNotNone(pw.node(testing.REAR_RCA))
 
+    def test_optical_out_when_asked_for(self):
+        self.assertIsNone(self.pw.node(testing.OPTICAL_OUT))      # off by default
+        pw = testing.FakePipeWire(optical_out=True)
+        node = pw.node(testing.OPTICAL_OUT)
+        props = node["info"]["props"]
+        self.assertEqual((props["media.class"], props["api.alsa.path"]), ("Audio/Sink", "hw:AE9,4"))
+        self.assertTrue(ae9.is_ae9(props))
+        self.assertEqual(ae9.output_kind(props), "optical_out")
+        self.assertEqual(ae9.output_kind(pw.node(SINK)["info"]["props"]), "main")
+        self.assertLess(node["id"], pw.node(SINK)["id"])          # first in pw-dump
+        ports = {p["info"]["props"]["port.name"] for p in pw.ports(node["id"])}
+        self.assertEqual(ports, {"playback_FL", "playback_FR", "monitor_FL", "monitor_FR"})
+        pw.card_present(False)
+        self.assertIsNone(pw.node(testing.OPTICAL_OUT))
+        pw.card_present(True)
+        self.assertIsNotNone(pw.node(testing.OPTICAL_OUT))
+
     def test_reads_like_pw_dump(self):
         v0 = self.pw.version
         dumped = json.loads(self.pw.run("pw-dump"))

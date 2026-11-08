@@ -2,6 +2,21 @@
 
 SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
 
+## 0.3.8 (2026-11-08)
+
+- `ae9.output_kind()`: tells the AE-9's separate optical output (driver
+  0.12.0, hw:AE9,4: `alsa_output.pci-<addr>.optical_out`, or the old
+  drop-in's `alsa_output.ae9_optical`) from the main output, so an app
+  never takes the optical sink for its speakers / headphones.
+- `Mixer.get_iec958()` / `set_iec958()`: an IEC958 control's 24 channel-status
+  bytes (driver 0.12.0's "IEC958 Playback Default" on the optical output:
+  AES0 bit 1 = non-audio passthrough). `TYPE_IEC958`; the fake mixer has
+  them too, with `add_iec958()`.
+- `testing.FakePipeWire(optical_out=True)`: the fake card gets driver
+  0.12.0's Optical Out sink (`testing.OPTICAL_OUT`, hw:AE9,4), off by
+  default. It comes before the main sink in pw-dump, so a test catches an
+  app that takes the first AE-9 sink for its output.
+
 ## 0.3.7 (2026-11-08)
 
 - The fake AE-9's "DAC Filter" follows driver 0.11.0: the seven ES9038Q2M
