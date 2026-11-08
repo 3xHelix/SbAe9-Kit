@@ -2,6 +2,12 @@
 
 SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
 
+## 0.3.7 (2026-11-08)
+
+- The fake AE-9's "DAC Filter" follows driver 0.11.0: the seven ES9038Q2M
+  filters with the Creative app's names, Apodizing Fast Roll Off (Windows'
+  startup filter, the default) first. Was Default / Fast / Slow.
+
 ## 0.3.6 (2026-11-07)
 
 - `ae9` knows driver 0.10.1's Rear RCA In (the head unit's rear RCA jacks,
