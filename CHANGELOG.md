@@ -2,6 +2,18 @@
 
 SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
 
+## 0.3.9 (2026-11-18)
+
+- `ae9.reload_notice_path()` / `ae9.reload_notice_active()`: driver
+  0.12.13's ae9-reload notice, shared instead of written twice (SBC's
+  `card.py`, AudioMon's `driverstate.py`). `$XDG_RUNTIME_DIR/ae9-reload` (or
+  `/run/user/<uid>/ae9-reload`) holds a PID; it counts while that PID is
+  alive in /proc. An empty or unreadable notice counts for
+  `RELOAD_NOTICE_MAX_S` (120 s) by its mtime, then is ignored. Plain
+  functions, no Qt, no state, read-only (fine for listen-only apps).
+- `testing.write_reload_notice(path, pid=None, age_s=0)` and
+  `testing.dead_pid()`: a fake notice (live, stale, empty or back-dated).
+
 ## 0.3.8 (2026-11-08)
 
 - `ae9.output_kind()`: tells the AE-9's separate optical output (driver

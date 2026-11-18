@@ -73,6 +73,36 @@ class Ae9Test(unittest.TestCase):
                          (48000, 6))
         self.assertIsNone(ae9.parse_hw_params("closed\n"))
 
+    def test_reload_notice(self):
+        from sbae9kit import testing
+        tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp, True)
+        path = os.path.join(tmp, "ae9-reload")
+        self.assertFalse(ae9.reload_notice_active(path))                 # no notice
+        testing.write_reload_notice(path)                                 # this PID: alive
+        self.assertTrue(ae9.reload_notice_active(path))
+        testing.write_reload_notice(path, pid=testing.dead_pid())         # stale
+        self.assertFalse(ae9.reload_notice_active(path))
+        testing.write_reload_notice(path, pid="")                         # empty: counts by mtime
+        self.assertTrue(ae9.reload_notice_active(path))
+        mtime = os.stat(path).st_mtime
+        self.assertFalse(ae9.reload_notice_active(path, now=mtime + ae9.RELOAD_NOTICE_MAX_S))
+        testing.write_reload_notice(path, pid="", age_s=ae9.RELOAD_NOTICE_MAX_S + 1)
+        self.assertFalse(ae9.reload_notice_active(path))
+        with open(path, "w") as f:
+            f.write("junk\n")                                             # unreadable: like empty
+        self.assertTrue(ae9.reload_notice_active(path))
+        os.remove(path)
+        self.assertFalse(ae9.reload_notice_active(path))
+
+        old = os.environ.get("XDG_RUNTIME_DIR")
+        self.addCleanup(lambda: os.environ.__setitem__("XDG_RUNTIME_DIR", old) if old is not None
+                        else os.environ.pop("XDG_RUNTIME_DIR", None))
+        os.environ["XDG_RUNTIME_DIR"] = tmp
+        self.assertEqual(ae9.reload_notice_path(), path)
+        os.environ.pop("XDG_RUNTIME_DIR")
+        self.assertEqual(ae9.reload_notice_path(), f"/run/user/{os.getuid()}/ae9-reload")
+
 
 class DesktopTest(unittest.TestCase):
     def test_scale_does_not_stack_over_relaunches(self):
