@@ -2,6 +2,16 @@
 
 SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
 
+## 0.3.11 (2026-11-21)
+
+- `MODELS` wording from Creative's Sound Blaster Command support notes
+  (via SBC): the AE-9 has no Lighting page (`lighting` False; only the AE-5
+  has one). New features `encoder` (AE-9, AE-7; not the plain AE-5),
+  `aux_in` (AE-9), `line_in`, `input_select` (AE-7, AE-5), `front_mic`
+  (AE-5), `hp_gain_names` (AE-7, AE-5: Low / Normal / High) and
+  `dac_filter_names` (AE-7; a DAC Filter control's own items always win).
+  The AE-5's `optical_out_max` is 96000.
+
 ## 0.3.10 (2026-11-20)
 
 - Multi-card groundwork (AE-9 now, AE-7 later), one detection for both apps.

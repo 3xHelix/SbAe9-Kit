@@ -271,6 +271,19 @@ class BoardsTest(unittest.TestCase):
         self.assertEqual(c.model.pci_devices, (0x0012,))
         self.assertEqual(ae9.MODELS["ae9"].pci_devices, (0x0010, 0x0012))
 
+    def test_model_wording(self):
+        ae9_, ae7, ae5 = (ae9.MODELS[k] for k in ("ae9", "ae7", "ae5"))
+        self.assertEqual([m.has("lighting") for m in (ae9_, ae7, ae5)], [False, False, True])
+        self.assertEqual([m.has("encoder") for m in (ae9_, ae7, ae5)], [True, True, False])
+        self.assertEqual([m.has("input_select") for m in (ae9_, ae7, ae5)], [False, True, True])
+        self.assertTrue(ae9_.has("aux_in") and ae5.has("front_mic") and not ae7.has("front_mic"))
+        self.assertEqual(len(ae7.features["dac_filter_names"]), ae7.features["dac_filters"])
+        self.assertEqual(ae7.features["hp_gain_names"][1], "Normal (32 - 149 ohm)")
+        self.assertEqual(ae5.features["optical_out_max"], 96000)
+        for m in ae9.MODELS.values():    # every model words every feature
+            self.assertTrue({"lighting", "encoder", "aux_in", "line_in", "input_select",
+                             "front_mic", "optical_out_max", "dac_filters"} <= set(m.features))
+
     def test_pipewire_nodes_of_our_cards(self):
         ae7 = {"node.name": "alsa_output.pci-0000_07_00.0.analog-stereo", "alsa.id": "AE7",
                "alsa.driver_name": "snd_hda_codec_creative_ae9", "api.alsa.path": "hw:AE7,0", "alsa.card": 0}
