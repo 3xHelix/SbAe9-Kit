@@ -25,6 +25,7 @@ so an edit made in an app's copy fails that app's tests.
 | Module | What it does |
 |---|---|
 | `ae9` | Read-only AE-9 facts: which PipeWire nodes are the card (by name, never PCI address or card number), mic / optical in / What U Hear, driver version and options, what its PCMs are open at, whether ae9-reload is reloading the driver (its notice) |
+| `boards` | Which cards are ours (AE-9, AE-7; AE-5 reserved), bound to the AE driver: detection, models, wording-level features, naming. Used through `ae9` |
 | `mixer` | ALSA mixer controls via ctypes, read **and write**. Control apps only: SbAe9-AudioMon is listen-only and never imports it |
 | `palettes` | The Command, Helix, Albino and Wololo palettes, the shared warning red, level-meter zone colours |
 | `glass` | Glass: see-through backgrounds on any palette, KDE's blur behind |

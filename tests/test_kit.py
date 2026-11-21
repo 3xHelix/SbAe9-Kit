@@ -175,6 +175,127 @@ class GlassPaletteTest(unittest.TestCase):
         self.assertIs(palettes.get("nope"), palettes.PALETTES["command"])
 
 
+class BoardsTest(unittest.TestCase):
+    """Card detection (sbae9kit.boards, used through ae9) on fake sound trees."""
+
+    def setUp(self):
+        from sbae9kit import boards, testing
+        self.boards, self.t = boards, testing
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+        old = boards.ROOT
+        self.addCleanup(lambda: (setattr(boards, "ROOT", old), boards.refresh()))
+
+    def tree(self, *cards):
+        return self.t.fake_sound_tree(self.tmp, cards)
+
+    def test_the_ae9_as_on_the_real_machine(self):
+        t = self.t
+        self.tree(t.HDMI_CARD, t.USB_CARD, t.AE9_CARD)
+        (c,) = ae9.find_cards()
+        self.assertEqual((c.index, c.id, c.short, c.name, c.key, c.subsystem, c.source),
+                         (2, "AE9", "AE-9", "Sound Blaster AE-9", "ae9", 0x0071, "card_id"))
+        self.assertIn("Sound Blaster AE-9", c.longname)
+        self.assertEqual(c.hw(4), "hw:AE9,4")
+        self.assertTrue(c.proc.endswith("/proc/asound/AE9"))
+        self.assertTrue(c.has_pcm("4p") and c.has_pcm("1c"))
+        self.assertFalse(c.has_pcm("5p"))
+        self.assertTrue(ae9.has_capture_pcm(1) and ae9.has_capture_pcm(3))   # the fake tree, not the host
+        self.assertFalse(ae9.has_capture_pcm(1, card_id="AE7"))
+        hw = os.path.join(c.proc, "pcm0p", "sub0")
+        os.makedirs(hw)
+        with open(os.path.join(hw, "hw_params"), "w") as f:
+            f.write("channels: 2\nrate: 96000 (96000/1)\n")
+        self.assertEqual(ae9.pcm_open_at("pcm0p"), (96000, 2))
+        self.assertTrue(c.has("head_unit"))
+        self.assertEqual(str(c.model), "AE-9")
+        self.assertIs(ae9.current(), ae9.current())          # cached
+        self.assertEqual(ae9.card_id(), "AE9")
+
+    def test_the_ae7(self):
+        self.tree(self.t.AE7_CARD)
+        c = ae9.current()
+        self.assertEqual((c.id, c.short, c.index), ("AE7", "AE-7", 0))
+        self.assertTrue(c.model.provisional)
+        self.assertFalse(c.has("head_unit") or c.has("optical_in") or c.has("direct_51"))
+        self.assertEqual(c.features["hp_gain"], "software")
+        self.assertEqual(c.features["optical_out_max"], 96000)
+        self.assertFalse(c.has_pcm("1c"))                     # no optical in
+        self.assertEqual(ae9.card_id(), "AE7")
+
+    def test_never_a_card_on_another_driver(self):
+        t = self.t
+        self.tree(t.HDMI_CARD, t.AE7_INTREE, t.USB_CARD)
+        self.assertEqual(ae9.find_cards(), [])
+        self.assertIsNone(ae9.current())
+        self.assertEqual(ae9.card_id(), "AE9")                # as before detection
+        intree = {"node.name": "alsa_output.pci-0000_07_00.0.analog-stereo",
+                  "alsa.driver_name": "snd_hda_intel", "alsa.card_name": "Sound Blaster AE-7",
+                  "api.alsa.path": "hw:AE7,0"}
+        self.assertFalse(ae9.is_our_card(intree))
+
+    def test_no_cards_at_all(self):
+        self.tree()
+        self.assertEqual(ae9.find_cards(), [])
+        self.assertEqual(ae9.card_id(), "AE9")
+
+    def test_two_cards_first_by_index_or_the_pick(self):
+        t = self.t
+        self.tree(t.AE7_CARD, t.HDMI_CARD, t.AE9_CARD)
+        self.assertEqual([c.id for c in ae9.find_cards()], ["AE7", "AE9"])
+        self.assertEqual(ae9.find_card().id, "AE7")
+        self.assertEqual(ae9.find_card(prefer="ae9").id, "AE9")
+        self.assertEqual(ae9.find_card(prefer="AE9").index, 2)
+        self.assertEqual(ae9.find_card(prefer="gone").id, "AE7")
+
+    def test_detection_order(self):
+        t = self.t
+        renamed = ("MyCard",) + t.AE7_CARD[1:]                # id doesn't say: the name does
+        self.tree(renamed)
+        self.assertEqual((ae9.current().short, ae9.current().source), ("AE-7", "longname"))
+        bare = ("X",) + ("HD-Audio", "HD-Audio at 0x0") + t.AE9_CARD[3:]   # only subsys says
+        self.tree(bare)
+        self.assertEqual((ae9.current().short, ae9.current().source), ("AE-9", "subsys"))
+        self.assertEqual(ae9.current().id, "X")
+        # a future "Card Model" control comes first
+        self.assertEqual(ae9.find_cards(card_model={0: "Sound Blaster AE-7"})[0].source, "card_model")
+        self.assertEqual(ae9.identify("AE9", "Sound Blaster AE-7", 0x0081), (ae9.MODELS["ae9"], "card_id"))
+
+    def test_the_ae5_is_reserved(self):
+        self.tree(self.t.AE5_CARD)
+        self.assertEqual(ae9.find_cards(), [])
+        (c,) = ae9.find_cards(supported_only=False)
+        self.assertEqual((c.short, c.model.supported), ("AE-5", False))
+        self.assertTrue(c.model.provisional and c.has("lighting"))
+        self.assertFalse(c.has("dsd"))
+        self.assertEqual(c.model.pci_devices, (0x0012,))
+        self.assertEqual(ae9.MODELS["ae9"].pci_devices, (0x0010, 0x0012))
+
+    def test_pipewire_nodes_of_our_cards(self):
+        ae7 = {"node.name": "alsa_output.pci-0000_07_00.0.analog-stereo", "alsa.id": "AE7",
+               "alsa.driver_name": "snd_hda_codec_creative_ae9", "api.alsa.path": "hw:AE7,0", "alsa.card": 0}
+        self.assertTrue(ae9.is_our_card(ae7) and ae9.is_ae9(ae7))
+        self.tree(self.t.AE7_CARD, self.t.AE9_CARD)
+        ae7c, ae9c = ae9.find_cards()
+        self.assertTrue(ae9.is_our_card(ae7, ae7c))
+        self.assertFalse(ae9.is_our_card(ae7, ae9c))
+        self.assertTrue(ae9.is_our_card(SINK | {"alsa.id": "AE9"}, ae9c))
+        dropin = {"node.name": "alsa_input.ae7_optical", "api.alsa.path": "hw:AE7,1"}
+        self.assertTrue(ae9.is_our_card(dropin, ae7c))
+        self.assertEqual(ae9.input_kind({"node.name": "x", "api.alsa.path": "hw:AE7,2"}), "what_u_hear")
+        self.assertEqual(ae9.output_kind({"node.name": "x", "api.alsa.path": "hw:AE7,4"}), "optical_out")
+        self.assertEqual(ae9.output_kind({"node.name": "x", "api.alsa.path": "hw:HDMI,4"}), "main")
+        # PipeWire's paths are numeric (hw:2,4): they count only with our driver
+        ours = {"node.name": "x", "api.alsa.path": "hw:2,4", "alsa.driver_name": "snd_hda_codec_creative_ae9"}
+        self.assertEqual(ae9.output_kind(ours), "optical_out")
+        self.assertEqual(ae9.output_kind(ours | {"alsa.driver_name": "snd_hda_intel"}), "main")
+        self.assertEqual(ae9.input_kind(ours | {"api.alsa.path": "hw:2,1"}), "optical_in")
+        self.assertEqual((ae7c.index, ae9c.index), (0, 1))
+        self.assertTrue(ae9.is_our_card(ours | {"api.alsa.path": "hw:1,4"}, ae9c))
+        self.assertFalse(ae9.is_our_card(ours | {"api.alsa.path": "hw:1,4"}, ae7c))
+        self.assertFalse(ae9.is_our_card(ours, ae9c))          # hw:2: neither card
+
+
 class VendorTest(unittest.TestCase):
     def test_sync_and_verify(self):
         import subprocess

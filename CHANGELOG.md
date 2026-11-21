@@ -2,6 +2,33 @@
 
 SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
 
+## 0.3.10 (2026-11-20)
+
+- Multi-card groundwork (AE-9 now, AE-7 later), one detection for both apps.
+  New `sbae9kit.boards`, used through `ae9`: `find_cards()`, `find_card(prefer=)`,
+  `current()` / `refresh()` (cached), `card_id()` ("AE9" when nothing is found,
+  so an AE-9 machine behaves as before). Only cards bound to
+  snd-hda-codec-creative-ae9 count, never the in-tree snd_hda_intel. Each card
+  is identified by its ALSA id, else its long/short name, else its PCI
+  subsystem (0x0071 AE-9, 0x0081 AE-7, 0x0051 / 0x0191 AE-5, reserved). A
+  future "Card Model" control can come first (`card_model=`).
+- `Card`: index, id, model, longname, subsystem, source; `hw(dev)`, `proc`,
+  `has_pcm("4p")`, and short / name / key / features from its `Model`.
+  `MODELS`: AE-9, AE-7 (provisional) and AE-5 (reserved, provisional) with name, short, pci_devices,
+  key, node_prefix and wording-level features (head_unit, optical_in,
+  direct_51, dsd, hp_gain, dsp_51_analog, optical_out_max, dac_filters,
+  lighting). The controls and PCMs decide what a card can do; the features
+  only word it.
+- `ae9.is_our_card(props, card=None)`: a PipeWire node of any of our cards
+  (or of `card`). A node from another driver never counts. `is_ae9` is now
+  an alias. `input_kind` / `output_kind` know `hw:AE7,N` too, and
+  PipeWire's numeric `hw:<index>,N` when the node's driver is ours.
+  `has_capture_pcm` / `pcm_open_at` default to the detected card, and read
+  under the same root as `Card.proc` (a fake tree in tests).
+- `testing.fake_sound_tree(root, cards)` with `AE9_CARD`, `AE7_CARD`,
+  `AE7_INTREE`, `AE5_CARD`, `HDMI_CARD` and `USB_CARD`: fake /sys and /proc
+  for detection tests.
+
 ## 0.3.9 (2026-11-18)
 
 - `ae9.reload_notice_path()` / `ae9.reload_notice_active()`: driver
