@@ -2,6 +2,22 @@
 
 SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
 
+## 0.3.13 (2026-11-24)
+
+- `ae7_waiting()` moves into the kit (it was the same in both apps), with
+  driver 0.13.0-rc3's new state: an AE-7 the driver doesn't run is
+  `"kernel"` (on the kernel's snd_hda_intel: support off), `"parked"` (on
+  no driver, with a park file `/etc/udev/rules.d/00-ae7-park.rules` or
+  `/etc/modprobe.d/ae7-park.conf`: support off, kept away from the
+  kernel's driver, which hangs the PC at boot on ASMedia-bridged AE-7s),
+  `"unbound"` (on no driver, no park file: enabling isn't finished), or
+  None. Reads under `ROOT` like the rest of `boards`.
+- Shared wording: `AE7_WAITING[state]` = (one sentence, the command to
+  offer, reboot after it), with `AE7_ENABLE` (`sudo ae9-ae7-enable`) and
+  `AE7_STATUS` (`ae9-ae7-enable --status`). `AE7_PCI`, `AE7_PARK_FILES`.
+- `testing.fake_ae7_pci(root, driver=None, parked=False)`: a fake AE-7 PCI
+  device and park files.
+
 ## 0.3.12 (2026-11-24)
 
 - The AE-7 by driver kit 11 (ae7-k11, still provisional until driver

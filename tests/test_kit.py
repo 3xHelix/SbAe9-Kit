@@ -189,6 +189,33 @@ class BoardsTest(unittest.TestCase):
     def tree(self, *cards):
         return self.t.fake_sound_tree(self.tmp, cards)
 
+    def test_an_ae7_the_driver_doesnt_run(self):
+        t, b, root = self.t, self.boards, self.tmp
+        self.boards.ROOT = root
+        self.assertIsNone(ae9.ae7_waiting())                       # no PCI devices at all
+        t.fake_ae7_pci(root, driver="snd_hda_intel")
+        self.assertEqual(ae9.ae7_waiting(), "kernel")              # support off, kernel's driver
+        t.fake_ae7_pci(root, driver=None)
+        self.assertEqual(ae9.ae7_waiting(), "unbound")             # enabling isn't finished
+        t.fake_ae7_pci(root, driver=None, parked=True)
+        self.assertEqual(ae9.ae7_waiting(), "parked")              # driver 0.13.0-rc3's park
+        os.remove(os.path.join(root, b.AE7_PARK_FILES[0]))         # either park file will do
+        self.assertEqual(ae9.ae7_waiting(), "parked")
+        t.fake_ae7_pci(root, driver=b.DRIVER, parked=True)
+        self.assertIsNone(ae9.ae7_waiting())                       # ours runs it
+        t.fake_ae7_pci(root, driver=None)
+        self.assertEqual(ae9.ae7_waiting(root), "unbound")         # root= works too
+        self.assertEqual(set(ae9.AE7_WAITING), {"kernel", "parked", "unbound"})
+        self.assertEqual([ae9.AE7_WAITING[k][1:] for k in ("kernel", "parked", "unbound")],
+                         [(ae9.AE7_ENABLE, True), (ae9.AE7_ENABLE, True), (ae9.AE7_STATUS, False)])
+        self.assertIn("parked", ae9.AE7_WAITING["parked"][0])
+        # another Creative device (an AE-9) is never an AE-7
+        ae9_dev = t.fake_ae7_pci(root, driver=None, slot="0000:08:00.0")
+        with open(os.path.join(ae9_dev, "subsystem_device"), "w") as f:
+            f.write("0x0071\n")
+        t.fake_ae7_pci(root, driver=b.DRIVER)
+        self.assertIsNone(ae9.ae7_waiting())
+
     def test_the_ae9_as_on_the_real_machine(self):
         t = self.t
         self.tree(t.HDMI_CARD, t.USB_CARD, t.AE9_CARD)
