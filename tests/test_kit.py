@@ -219,7 +219,8 @@ class BoardsTest(unittest.TestCase):
         self.assertTrue(c.model.provisional)
         self.assertFalse(c.has("head_unit") or c.has("optical_in") or c.has("direct_51"))
         self.assertEqual(c.features["hp_gain"], "software")
-        self.assertEqual(c.features["optical_out_max"], 96000)
+        self.assertIsNone(c.features["optical_out_max"])      # kit 11: no optical out
+        self.assertFalse(c.has_pcm("4p"))                     # nor an encoder PCM
         self.assertFalse(c.has_pcm("1c"))                     # no optical in
         self.assertEqual(ae9.card_id(), "AE7")
 
@@ -274,12 +275,20 @@ class BoardsTest(unittest.TestCase):
     def test_model_wording(self):
         ae9_, ae7, ae5 = (ae9.MODELS[k] for k in ("ae9", "ae7", "ae5"))
         self.assertEqual([m.has("lighting") for m in (ae9_, ae7, ae5)], [False, False, True])
-        self.assertEqual([m.has("encoder") for m in (ae9_, ae7, ae5)], [True, True, False])
+        self.assertEqual([m.has("encoder") for m in (ae9_, ae7, ae5)], [True, False, False])
         self.assertEqual([m.has("input_select") for m in (ae9_, ae7, ae5)], [False, True, True])
         self.assertTrue(ae9_.has("aux_in") and ae5.has("front_mic") and not ae7.has("front_mic"))
         self.assertEqual(len(ae7.features["dac_filter_names"]), ae7.features["dac_filters"])
         self.assertEqual(ae7.features["hp_gain_names"][1], "Normal (32 - 149 ohm)")
         self.assertEqual(ae5.features["optical_out_max"], 96000)
+        # the AE-7 by driver kit 11: no DSD, optical, Speaker Setup; its own rates
+        self.assertFalse(ae7.has("dsd") or ae7.has("speaker_setup") or ae7.features["optical_out_max"])
+        self.assertTrue(ae9_.has("speaker_setup") and ae9_.has("dsd"))
+        self.assertEqual(ae7.features["dsp_rates"], (48000,))
+        self.assertNotIn(176400, ae7.features["direct_rates"])
+        self.assertEqual((ae7.features["direct_channels"], ae7.features["formats"]), (2, ("S32_LE",)))
+        for k in ("dsp_rates", "direct_rates", "direct_channels", "mic_rates", "whu_rates", "formats"):
+            self.assertIsNone(ae9_.features[k], k)      # the AE-9 keeps the apps' own logic
         for m in ae9.MODELS.values():    # every model words every feature
             self.assertTrue({"lighting", "encoder", "aux_in", "line_in", "input_select",
                              "front_mic", "optical_out_max", "dac_filters"} <= set(m.features))

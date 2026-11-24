@@ -2,6 +2,18 @@
 
 SbAe9-Kit: the shared base of SbAe9-SBC and SbAe9-AudioMon.
 
+## 0.3.12 (2026-11-24)
+
+- The AE-7 by driver kit 11 (ae7-k11, still provisional until driver
+  0.13.0): no DSD, no encoder, no optical out (`optical_out_max` None). Its
+  DAC Filter items match `dac_filter_names`.
+- New features: `speaker_setup` (Bass Redirect, levels, distances: AE-9 yes,
+  AE-7 no) and a rate model: `dsp_rates`, `direct_rates`, `direct_channels`,
+  `mic_rates`, `whu_rates`, `formats`. The AE-7: DSP 48 kHz only; Direct 44.1
+  to 384 kHz without 176.4, stereo; mic 44.1 / 48 / 96; What U Hear 44.1 /
+  48; S32_LE only. On the AE-9 they are None: the apps keep their own
+  driver-version logic.
+
 ## 0.3.11 (2026-11-21)
 
 - `MODELS` wording from Creative's Sound Blaster Command support notes
